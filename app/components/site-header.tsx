@@ -49,7 +49,7 @@ export default async function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-[#f4f1e9]/95 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-8 sm:py-4">
+      <div className="mx-auto flex h-[98px] w-full max-w-7xl items-center justify-between px-5 sm:px-8">
         <Link
           href={user ? "/dashboard" : "/"}
           className="shrink-0 text-base font-black uppercase tracking-[0.16em] text-emerald-800 sm:text-lg sm:tracking-[0.18em]"

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { PageContainer } from "@/app/components/page-container";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -42,10 +43,7 @@ type MemberRecord = {
   plan: PlanRecord | null;
 };
 
-function formatMoney(
-  amountPaise: number,
-  currency = "INR",
-) {
+function formatMoney(amountPaise: number, currency = "INR") {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency,
@@ -126,25 +124,19 @@ export default async function AdminMembersPage() {
 
   const admin = createAdminClient();
 
-  const [
-    authUsersResult,
-    profilesResult,
-    subscriptionsResult,
-    plansResult,
-  ] = await Promise.all([
-    admin.auth.admin.listUsers({
-      page: 1,
-      perPage: 1000,
-    }),
+  const [authUsersResult, profilesResult, subscriptionsResult, plansResult] =
+    await Promise.all([
+      admin.auth.admin.listUsers({
+        page: 1,
+        perPage: 1000,
+      }),
 
-    admin
-      .from("profiles")
-      .select("id, full_name, role, created_at"),
+      admin.from("profiles").select("id, full_name, role, created_at"),
 
-    admin
-      .from("subscriptions")
-      .select(
-        `
+      admin
+        .from("subscriptions")
+        .select(
+          `
           user_id,
           plan_id,
           status,
@@ -155,14 +147,12 @@ export default async function AdminMembersPage() {
           razorpay_subscription_id,
           created_at
         `,
-      )
-      .order("created_at", {
-        ascending: false,
-      }),
+        )
+        .order("created_at", {
+          ascending: false,
+        }),
 
-    admin
-      .from("subscription_plans")
-      .select(
+      admin.from("subscription_plans").select(
         `
           id,
           code,
@@ -172,7 +162,7 @@ export default async function AdminMembersPage() {
           billing_interval
         `,
       ),
-  ]);
+    ]);
 
   const pageError =
     authUsersResult.error ??
@@ -180,98 +170,75 @@ export default async function AdminMembersPage() {
     subscriptionsResult.error ??
     plansResult.error;
 
-  const profiles =
-    (profilesResult.data as ProfileRecord[] | null) ?? [];
+  const profiles = (profilesResult.data as ProfileRecord[] | null) ?? [];
 
   const subscriptions =
-    (subscriptionsResult.data as
-      | SubscriptionRecord[]
-      | null) ?? [];
+    (subscriptionsResult.data as SubscriptionRecord[] | null) ?? [];
 
-  const plans =
-    (plansResult.data as PlanRecord[] | null) ?? [];
+  const plans = (plansResult.data as PlanRecord[] | null) ?? [];
 
   const profileByUserId = new Map(
     profiles.map((profile) => [profile.id, profile]),
   );
 
-  const subscriptionByUserId = new Map<
-    string,
-    SubscriptionRecord
-  >();
+  const subscriptionByUserId = new Map<string, SubscriptionRecord>();
 
   for (const subscription of subscriptions) {
     if (!subscriptionByUserId.has(subscription.user_id)) {
-      subscriptionByUserId.set(
-        subscription.user_id,
-        subscription,
-      );
+      subscriptionByUserId.set(subscription.user_id, subscription);
     }
   }
 
-  const planById = new Map(
-    plans.map((plan) => [plan.id, plan]),
-  );
+  const planById = new Map(plans.map((plan) => [plan.id, plan]));
 
-  const members: MemberRecord[] =
-    authUsersResult.data.users
-      .map((authUser) => {
-        const profile = profileByUserId.get(authUser.id);
-        const subscription =
-          subscriptionByUserId.get(authUser.id) ?? null;
+  const members: MemberRecord[] = authUsersResult.data.users
+    .map((authUser) => {
+      const profile = profileByUserId.get(authUser.id);
+      const subscription = subscriptionByUserId.get(authUser.id) ?? null;
 
-        const plan =
-          subscription?.plan_id
-            ? planById.get(subscription.plan_id) ?? null
-            : null;
+      const plan = subscription?.plan_id
+        ? (planById.get(subscription.plan_id) ?? null)
+        : null;
 
-        const metadataName =
-          typeof authUser.user_metadata?.full_name ===
-          "string"
-            ? authUser.user_metadata.full_name.trim()
-            : "";
+      const metadataName =
+        typeof authUser.user_metadata?.full_name === "string"
+          ? authUser.user_metadata.full_name.trim()
+          : "";
 
-        return {
-          id: authUser.id,
-          email: authUser.email ?? "No email",
-          fullName:
-            profile?.full_name ||
-            metadataName ||
-            authUser.email?.split("@")[0] ||
-            "Unnamed member",
-          role: profile?.role ?? "member",
-          joinedAt:
-            profile?.created_at ?? authUser.created_at,
-          subscription,
-          plan,
-        };
-      })
-      .sort(
-        (firstMember, secondMember) =>
-          new Date(secondMember.joinedAt).getTime() -
-          new Date(firstMember.joinedAt).getTime(),
-      );
+      return {
+        id: authUser.id,
+        email: authUser.email ?? "No email",
+        fullName:
+          profile?.full_name ||
+          metadataName ||
+          authUser.email?.split("@")[0] ||
+          "Unnamed member",
+        role: profile?.role ?? "member",
+        joinedAt: profile?.created_at ?? authUser.created_at,
+        subscription,
+        plan,
+      };
+    })
+    .sort(
+      (firstMember, secondMember) =>
+        new Date(secondMember.joinedAt).getTime() -
+        new Date(firstMember.joinedAt).getTime(),
+    );
 
   const activeMemberCount = members.filter((member) =>
-    ["active", "trialing"].includes(
-      member.subscription?.status ?? "",
-    ),
+    ["active", "trialing"].includes(member.subscription?.status ?? ""),
   ).length;
 
   const demoSubscriptionCount = members.filter(
-    (member) =>
-      member.subscription?.payment_provider === "demo",
+    (member) => member.subscription?.payment_provider === "demo",
   ).length;
 
   const razorpaySubscriptionCount = members.filter(
-    (member) =>
-      member.subscription?.payment_provider ===
-      "razorpay",
+    (member) => member.subscription?.payment_provider === "razorpay",
   ).length;
 
   return (
-    <main className="min-h-screen bg-[#f4f1e9] px-5 py-10 text-slate-950 sm:px-8 lg:py-16">
-      <section className="mx-auto max-w-7xl">
+    <PageContainer>
         <Link
           href="/admin"
           className="font-semibold text-emerald-700 transition hover:text-emerald-900"
@@ -289,9 +256,8 @@ export default async function AdminMembersPage() {
           </h1>
 
           <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-300">
-            Review registered users, membership plans,
-            subscription status, payment providers and renewal
-            dates.
+            Review registered users, membership plans, subscription status,
+            payment providers and renewal dates.
           </p>
         </div>
 
@@ -305,52 +271,50 @@ export default async function AdminMembersPage() {
         ) : (
           <>
             <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <p className="text-sm font-semibold text-slate-500">
+              <article className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-emerald-950 hover:bg-emerald-950 hover:shadow-lg">
+                <p className="text-sm font-semibold text-slate-500 transition group-hover:text-emerald-200">
                   Registered users
                 </p>
 
-                <p className="mt-2 text-4xl font-bold">
+                <p className="mt-2 text-4xl font-bold text-slate-950 transition group-hover:text-white">
                   {members.length}
                 </p>
-              </div>
+              </article>
 
-              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <p className="text-sm font-semibold text-slate-500">
+              <article className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-emerald-950 hover:bg-emerald-950 hover:shadow-lg">
+                <p className="text-sm font-semibold text-slate-500 transition group-hover:text-emerald-200">
                   Active memberships
                 </p>
 
-                <p className="mt-2 text-4xl font-bold text-emerald-700">
+                <p className="mt-2 text-4xl font-bold text-emerald-700 transition group-hover:text-white">
                   {activeMemberCount}
                 </p>
-              </div>
+              </article>
 
-              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <p className="text-sm font-semibold text-slate-500">
+              <article className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-emerald-950 hover:bg-emerald-950 hover:shadow-lg">
+                <p className="text-sm font-semibold text-slate-500 transition group-hover:text-emerald-200">
                   Demo subscriptions
                 </p>
 
-                <p className="mt-2 text-4xl font-bold">
+                <p className="mt-2 text-4xl font-bold text-slate-950 transition group-hover:text-white">
                   {demoSubscriptionCount}
                 </p>
-              </div>
+              </article>
 
-              <div className="rounded-3xl bg-emerald-950 p-6 text-white shadow-sm">
-                <p className="text-sm font-semibold text-emerald-200">
+              <article className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-emerald-950 hover:bg-emerald-950 hover:shadow-lg">
+                <p className="text-sm font-semibold text-slate-500 transition group-hover:text-emerald-200">
                   Razorpay subscriptions
                 </p>
 
-                <p className="mt-2 text-4xl font-bold">
+                <p className="mt-2 text-4xl font-bold text-slate-950 transition group-hover:text-white">
                   {razorpaySubscriptionCount}
                 </p>
-              </div>
+              </article>
             </div>
 
             <div className="mt-8 overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
               <div className="p-6 sm:p-8">
-                <h2 className="text-2xl font-bold">
-                  Registered members
-                </h2>
+                <h2 className="text-2xl font-bold">Registered members</h2>
 
                 <p className="mt-2 text-slate-600">
                   Subscription information is shown when available.
@@ -370,12 +334,8 @@ export default async function AdminMembersPage() {
                         <th className="px-6 py-4">Role</th>
                         <th className="px-6 py-4">Plan</th>
                         <th className="px-6 py-4">Status</th>
-                        <th className="px-6 py-4">
-                          Payment provider
-                        </th>
-                        <th className="px-6 py-4">
-                          Renewal/end date
-                        </th>
+                        <th className="px-6 py-4">Payment provider</th>
+                        <th className="px-6 py-4">Renewal/end date</th>
                         <th className="px-6 py-4">Joined</th>
                       </tr>
                     </thead>
@@ -384,9 +344,7 @@ export default async function AdminMembersPage() {
                       {members.map((member) => (
                         <tr key={member.id}>
                           <td className="px-6 py-5">
-                            <p className="font-bold">
-                              {member.fullName}
-                            </p>
+                            <p className="font-bold">{member.fullName}</p>
 
                             <p className="mt-1 text-sm text-slate-500">
                               {member.email}
@@ -412,34 +370,28 @@ export default async function AdminMembersPage() {
                                     member.plan.currency,
                                   )}
                                   /
-                                  {member.plan.billing_interval ===
-                                  "year"
+                                  {member.plan.billing_interval === "year"
                                     ? "year"
                                     : "month"}
                                 </p>
                               </>
                             ) : (
-                              <span className="text-slate-500">
-                                No plan
-                              </span>
+                              <span className="text-slate-500">No plan</span>
                             )}
                           </td>
 
                           <td className="px-6 py-5">
                             <span
                               className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${getStatusClasses(
-                                member.subscription?.status ??
-                                  null,
+                                member.subscription?.status ?? null,
                               )}`}
                             >
                               {formatStatus(
-                                member.subscription?.status ??
-                                  null,
+                                member.subscription?.status ?? null,
                               )}
                             </span>
 
-                            {member.subscription
-                              ?.cancel_at_period_end && (
+                            {member.subscription?.cancel_at_period_end && (
                               <p className="mt-2 text-xs font-semibold text-amber-700">
                                 Cancels at period end
                               </p>
@@ -447,25 +399,18 @@ export default async function AdminMembersPage() {
                           </td>
 
                           <td className="px-6 py-5">
-                            {member.subscription
-                              ?.payment_provider ? (
+                            {member.subscription?.payment_provider ? (
                               <span className="font-semibold capitalize">
-                                {
-                                  member.subscription
-                                    .payment_provider
-                                }
+                                {member.subscription.payment_provider}
                               </span>
                             ) : (
-                              <span className="text-slate-500">
-                                —
-                              </span>
+                              <span className="text-slate-500">—</span>
                             )}
                           </td>
 
                           <td className="px-6 py-5 font-semibold">
                             {formatDate(
-                              member.subscription
-                                ?.current_period_end ?? null,
+                              member.subscription?.current_period_end ?? null,
                             )}
                           </td>
 
@@ -481,7 +426,6 @@ export default async function AdminMembersPage() {
             </div>
           </>
         )}
-      </section>
-    </main>
+    </PageContainer>
   );
 }

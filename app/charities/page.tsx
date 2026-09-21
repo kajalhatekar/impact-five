@@ -7,6 +7,7 @@ import {
   useState,
   type CSSProperties,
 } from "react";
+import { PageContainer } from "@/app/components/page-container";
 import { createClient } from "@/lib/supabase/client";
 
 type Charity = {
@@ -225,10 +226,8 @@ export default function CharitiesPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f5f1e8] text-slate-950">
-
-      <section className="px-4 pb-14 pt-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
+    <PageContainer>
+      <section>
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-emerald-700">
             Give back
           </p>
@@ -262,12 +261,11 @@ export default function CharitiesPage() {
               </div>
             )}
           </div>
-        </div>
       </section>
 
       {featuredCharity && (
-        <section className="px-4 pb-16 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-emerald-950 text-white">
+        <section className="mt-14">
+          <div className="overflow-hidden rounded-[2rem] bg-emerald-950 text-white">
             <div className="grid lg:grid-cols-2">
               <div
                 role="img"
@@ -322,8 +320,8 @@ export default function CharitiesPage() {
         </section>
       )}
 
-      <section className="bg-white px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
+      <section className="mt-16 bg-white py-16">
+        <div>
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-700">
@@ -555,6 +553,6 @@ export default function CharitiesPage() {
           )}
         </div>
       </section>
-    </main>
+    </PageContainer>
   );
 }

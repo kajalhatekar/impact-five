@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { PageContainer } from "@/app/components/page-container";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AdminPage() {
@@ -21,8 +22,7 @@ export default async function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f4f1e9] px-5 py-10 text-slate-950 sm:px-8 lg:py-16">
-      <section className="mx-auto max-w-6xl">
+    <PageContainer>
         <p className="text-sm font-bold uppercase tracking-[0.24em] text-emerald-700">
           Administrator
         </p>
@@ -94,7 +94,6 @@ export default async function AdminPage() {
             </p>
           </Link>
         </div>
-      </section>
-    </main>
+    </PageContainer>
   );
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { PageContainer } from "@/app/components/page-container";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -239,8 +240,7 @@ export default async function AdminWinnersPage() {
     drawErrorMessage;
 
   return (
-    <main className="min-h-screen bg-[#f4f1e9] px-5 py-10 text-slate-950 sm:px-8 lg:py-16">
-      <section className="mx-auto max-w-6xl">
+    <PageContainer>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Link
             href="/admin/draws"
@@ -303,7 +303,6 @@ export default async function AdminWinnersPage() {
             initialWinners={formattedWinners}
           />
         </div>
-      </section>
-    </main>
+    </PageContainer>
   );
 }

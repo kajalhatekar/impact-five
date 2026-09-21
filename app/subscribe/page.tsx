@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { PageContainer } from "@/app/components/page-container";
 import { createClient } from "@/lib/supabase/server";
 
 
@@ -61,8 +62,7 @@ export default async function SubscribePage() {
       : "";
 
   return (
-    <main className="min-h-screen bg-[#f4f1e9] px-5 py-10 sm:px-8 lg:py-16">
-      <section className="mx-auto max-w-6xl">
+    <PageContainer>
         <Link
           href="/dashboard"
           className="font-semibold text-emerald-700 transition hover:text-emerald-900"
@@ -129,7 +129,6 @@ export default async function SubscribePage() {
             />
           )}
         </div>
-      </section>
-    </main>
+    </PageContainer>
   );
 }

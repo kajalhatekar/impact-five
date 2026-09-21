@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { PageContainer } from "@/app/components/page-container";
 import { createClient } from "@/lib/supabase/server";
 
 type CharitySelection = {
@@ -217,8 +218,7 @@ export default async function DashboardPage() {
     null;
 
   return (
-    <main className="min-h-screen bg-[#f4f1e9] text-slate-950">
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+    <PageContainer>
         <section>
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-700">
             Your impact
@@ -590,7 +590,6 @@ export default async function DashboardPage() {
             </div>
           </section>
         )}
-      </div>
-    </main>
+    </PageContainer>
   );
 }
