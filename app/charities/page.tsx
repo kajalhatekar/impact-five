@@ -320,20 +320,20 @@ export default function CharitiesPage() {
         </section>
       )}
 
-      <section className="mt-16 bg-white py-16">
+      <section className="mt-16 border-t border-slate-200 pt-14 sm:pt-16">
         <div>
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,480px)] lg:items-end">
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-700">
                 Charity directory
               </p>
 
-              <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+              <h2 className="mt-3 max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl">
                 Find a cause close to you
               </h2>
             </div>
 
-            <div className="w-full lg:max-w-md">
+            <div className="w-full">
               <label
                 htmlFor="charity-search"
                 className="mb-2 block text-sm font-medium text-slate-700"
@@ -347,12 +347,12 @@ export default function CharitiesPage() {
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
                 placeholder="Search by name, cause or impact"
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
+                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
               />
             </div>
           </div>
 
-          <div className="mt-8 flex flex-wrap gap-2">
+          <div className="mt-7 flex flex-wrap gap-2">
             {categories.map((category) => (
               <button
                 key={category}
@@ -394,7 +394,7 @@ export default function CharitiesPage() {
               </p>
             </div>
           ) : (
-            <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-10 grid items-stretch gap-6 md:grid-cols-2 xl:grid-cols-3">
               {filteredCharities.map((charity) => {
                 const isSelected =
                   selection?.charity_id === charity.id;
@@ -405,7 +405,7 @@ export default function CharitiesPage() {
                 return (
                   <article
                     key={charity.id}
-                    className={`overflow-hidden rounded-3xl border bg-white transition hover:-translate-y-1 hover:shadow-lg ${
+                    className={`flex h-full flex-col overflow-hidden rounded-3xl border bg-white shadow-sm transition hover:-translate-y-1 hover:border-emerald-300 hover:shadow-lg ${
                       isSelected
                         ? "border-emerald-500 ring-4 ring-emerald-50"
                         : "border-slate-200"
@@ -415,7 +415,7 @@ export default function CharitiesPage() {
                       role="img"
                       aria-label={charity.name}
                       style={getCharityImageStyle(charity)}
-                      className={`h-48 bg-cover bg-center ${
+                      className={`h-44 shrink-0 bg-cover bg-center sm:h-48 ${
                         charity.image_url
                           ? ""
                           : "bg-gradient-to-br from-emerald-100 to-teal-200"
@@ -430,8 +430,8 @@ export default function CharitiesPage() {
                       )}
                     </div>
 
-                    <div className="p-6">
-                      <div className="flex items-start justify-between gap-3">
+                    <div className="flex flex-1 flex-col p-6">
+                      <div className="flex min-h-7 flex-wrap items-start justify-between gap-2">
                         <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
                           {charity.category}
                         </span>
@@ -443,11 +443,11 @@ export default function CharitiesPage() {
                         )}
                       </div>
 
-                      <h3 className="mt-4 text-xl font-bold">
+                      <h3 className="mt-4 min-h-14 line-clamp-2 text-xl font-bold leading-7">
                         {charity.name}
                       </h3>
 
-                      <p className="mt-3 line-clamp-3 text-sm leading-6 text-slate-600">
+                      <p className="mt-3 min-h-[4.5rem] line-clamp-3 text-sm leading-6 text-slate-600">
                         {charity.description}
                       </p>
 
@@ -464,65 +464,67 @@ export default function CharitiesPage() {
                       )}
 
                       {isChoosing ? (
-                        <div className="mt-6 rounded-2xl bg-slate-50 p-4">
-                          <label
-                            htmlFor={`percentage-${charity.id}`}
-                            className="block text-sm font-semibold text-slate-800"
-                          >
-                            Contribution percentage
-                          </label>
-
-                          <div className="mt-3 flex items-center gap-3">
-                            <input
-                              id={`percentage-${charity.id}`}
-                              type="range"
-                              min={10}
-                              max={100}
-                              step={5}
-                              value={percentage}
-                              onChange={(event) =>
-                                setPercentage(
-                                  Number(event.target.value),
-                                )
-                              }
-                              className="w-full accent-emerald-700"
-                            />
-
-                            <span className="min-w-14 rounded-lg bg-white px-3 py-2 text-center font-bold text-emerald-800">
-                              {percentage}%
-                            </span>
-                          </div>
-
-                          <p className="mt-2 text-xs text-slate-500">
-                            The minimum contribution is 10%.
-                          </p>
-
-                          <div className="mt-4 flex gap-2">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                void saveCharitySelection(charity)
-                              }
-                              disabled={isSaving}
-                              className="flex-1 rounded-xl bg-emerald-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+                        <div className="mt-auto pt-6">
+                          <div className="rounded-2xl bg-slate-50 p-4">
+                            <label
+                              htmlFor={`percentage-${charity.id}`}
+                              className="block text-sm font-semibold text-slate-800"
                             >
-                              {isSaving
-                                ? "Saving..."
-                                : "Confirm selection"}
-                            </button>
+                              Contribution percentage
+                            </label>
 
-                            <button
-                              type="button"
-                              onClick={closeSelectionForm}
-                              disabled={isSaving}
-                              className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white"
-                            >
-                              Cancel
-                            </button>
+                            <div className="mt-3 flex items-center gap-3">
+                              <input
+                                id={`percentage-${charity.id}`}
+                                type="range"
+                                min={10}
+                                max={100}
+                                step={5}
+                                value={percentage}
+                                onChange={(event) =>
+                                  setPercentage(
+                                    Number(event.target.value),
+                                  )
+                                }
+                                className="w-full accent-emerald-700"
+                              />
+
+                              <span className="min-w-14 rounded-lg bg-white px-3 py-2 text-center font-bold text-emerald-800">
+                                {percentage}%
+                              </span>
+                            </div>
+
+                            <p className="mt-2 text-xs text-slate-500">
+                              The minimum contribution is 10%.
+                            </p>
+
+                            <div className="mt-4 flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  void saveCharitySelection(charity)
+                                }
+                                disabled={isSaving}
+                                className="flex-1 rounded-xl bg-emerald-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
+                              >
+                                {isSaving
+                                  ? "Saving..."
+                                  : "Confirm selection"}
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={closeSelectionForm}
+                                disabled={isSaving}
+                                className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-white"
+                              >
+                                Cancel
+                              </button>
+                            </div>
                           </div>
                         </div>
                       ) : (
-                        <div className="mt-6 flex items-center gap-3">
+                        <div className="mt-auto flex items-center gap-3 pt-6">
                           <button
                             type="button"
                             onClick={() => openSelectionForm(charity)}

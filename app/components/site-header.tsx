@@ -2,6 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
+import CloseMenuLink from "./close-menu-link";
+import DismissibleDetails from "./dismissible-details";
 import NavigationLinks from "./navigation-links";
 
 function getInitials(name: string) {
@@ -21,11 +23,25 @@ export default async function SiteHeader() {
   } = await supabase.auth.getUser();
 
   let isAdmin = false;
+  let profileName = "";
 
   if (user) {
-    const { data: adminResult } = await supabase.rpc("is_admin");
+    const [adminResult, profileResult] = await Promise.all([
+      supabase.rpc("is_admin"),
 
-    isAdmin = adminResult === true;
+      supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", user.id)
+        .maybeSingle(),
+    ]);
+
+    isAdmin = adminResult.data === true;
+
+    profileName =
+      typeof profileResult.data?.full_name === "string"
+        ? profileResult.data.full_name.trim()
+        : "";
   }
 
   const metadataName =
@@ -34,7 +50,7 @@ export default async function SiteHeader() {
       : "";
 
   const emailName = user?.email?.split("@")[0] ?? "User";
-  const displayName = metadataName || emailName;
+  const displayName = profileName || metadataName || emailName;
   const initials = getInitials(displayName) || "U";
 
   async function signOut() {
@@ -52,19 +68,39 @@ export default async function SiteHeader() {
       <div className="mx-auto flex h-[98px] w-full max-w-7xl items-center justify-between px-5 sm:px-8">
         <Link
           href={user ? "/dashboard" : "/"}
-          className="shrink-0 text-base font-black uppercase tracking-[0.16em] text-emerald-800 sm:text-lg sm:tracking-[0.18em]"
+          aria-label="Impact Five home"
+          className="group flex shrink-0 items-center gap-3"
         >
-          Impact Five
+          <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-emerald-800 text-2xl font-black text-white shadow-sm ring-1 ring-emerald-950/10 transition group-hover:bg-emerald-700 group-hover:shadow-md">
+            5
+            <span
+              aria-hidden="true"
+              className="absolute right-0 top-0 h-3 w-3 rounded-full border-2 border-[#f4f1e9] bg-amber-400"
+            />
+          </span>
+
+          <span className="flex flex-col">
+            <span className="text-base font-black uppercase tracking-[0.16em] text-emerald-950 sm:text-lg sm:tracking-[0.18em]">
+              Impact <span className="text-emerald-700">Five</span>
+            </span>
+            <span className="hidden text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 sm:block">
+              Play. Give. Change.
+            </span>
+          </span>
         </Link>
 
         {/* Desktop navigation */}
         <div className="hidden items-center gap-3 lg:flex">
           <nav aria-label="Main navigation" className="flex items-center gap-2">
-            <NavigationLinks isSignedIn={Boolean(user)} isAdmin={isAdmin} />
+            <NavigationLinks
+              isSignedIn={Boolean(user)}
+              isAdmin={isAdmin}
+              variant="desktop"
+            />
           </nav>
 
           {user && (
-            <details className="group relative">
+            <DismissibleDetails className="group relative">
               <summary
                 aria-label="Open account menu"
                 className="flex cursor-pointer list-none items-center gap-3 rounded-full border border-slate-300 bg-white py-1.5 pl-1.5 pr-3 transition hover:border-emerald-600 hover:shadow-sm [&::-webkit-details-marker]:hidden"
@@ -105,7 +141,17 @@ export default async function SiteHeader() {
                 </div>
 
                 <div className="p-2">
-                  <form action={signOut}>
+                  <CloseMenuLink
+                    href="/account"
+                    className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800"
+                  >
+                    My account
+                  </CloseMenuLink>
+
+                  <form
+                    action={signOut}
+                    className="mt-1 border-t border-slate-100 pt-1"
+                  >
                     <button
                       type="submit"
                       className="w-full rounded-xl px-4 py-3 text-left text-sm font-semibold text-red-700 transition hover:bg-red-50"
@@ -115,12 +161,12 @@ export default async function SiteHeader() {
                   </form>
                 </div>
               </div>
-            </details>
+            </DismissibleDetails>
           )}
         </div>
 
         {/* Mobile hamburger menu */}
-        <details className="group relative lg:hidden">
+        <DismissibleDetails className="group relative lg:hidden">
           <summary
             aria-label="Open navigation menu"
             className="flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-xl border border-slate-300 bg-white text-emerald-800 shadow-sm transition hover:border-emerald-600 [&::-webkit-details-marker]:hidden"
@@ -134,22 +180,31 @@ export default async function SiteHeader() {
 
           <div className="absolute right-0 mt-3 w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
             {user && (
-              <div className="border-b border-slate-100 p-4">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-700 text-sm font-bold text-white">
+              <div className="border-t border-slate-100 p-3">
+                <CloseMenuLink
+                  href="/account"
+                  className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 shadow-sm transition hover:border-emerald-200 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
+                >
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-700 text-sm font-bold text-white">
                     {initials}
                   </span>
 
-                  <div className="min-w-0">
-                    <p className="truncate font-bold text-slate-950">
-                      {displayName}
-                    </p>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-bold text-slate-900 group-hover:text-emerald-900">
+                      My account
+                    </span>
+                    <span className="block text-xs text-slate-500">
+                      Profile and settings
+                    </span>
+                  </span>
 
-                    <p className="truncate text-sm text-slate-500">
-                      {user.email}
-                    </p>
-                  </div>
-                </div>
+                  <span
+                    aria-hidden="true"
+                    className="text-xl text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-emerald-700"
+                  >
+                    &rarr;
+                  </span>
+                </CloseMenuLink>
               </div>
             )}
 
@@ -157,7 +212,11 @@ export default async function SiteHeader() {
               aria-label="Mobile navigation"
               className="flex flex-col gap-1 p-3"
             >
-              <NavigationLinks isSignedIn={Boolean(user)} isAdmin={isAdmin} />
+              <NavigationLinks
+                isSignedIn={Boolean(user)}
+                isAdmin={isAdmin}
+                variant="mobile"
+              />
             </nav>
 
             {user && (
@@ -173,7 +232,7 @@ export default async function SiteHeader() {
               </div>
             )}
           </div>
-        </details>
+        </DismissibleDetails>
       </div>
     </header>
   );
