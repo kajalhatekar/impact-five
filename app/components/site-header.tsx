@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
@@ -9,7 +10,9 @@ function getInitials(name: string) {
     .trim()
     .split(/\s+/)
     .slice(0, 2)
-    .map((word) => word.charAt(0).toUpperCase())
+    .map((word) =>
+      word.charAt(0).toUpperCase(),
+    )
     .join("");
 }
 
@@ -20,14 +23,33 @@ export default async function SiteHeader() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  let isAdmin = false;
+
+  if (user) {
+    const {
+      data: adminStatus,
+      error: adminStatusError,
+    } = await supabase.rpc("is_admin");
+
+    if (!adminStatusError) {
+      isAdmin = Boolean(adminStatus);
+    }
+  }
+
   const metadataName =
-    typeof user?.user_metadata?.full_name === "string"
+    typeof user?.user_metadata?.full_name ===
+    "string"
       ? user.user_metadata.full_name.trim()
       : "";
 
-  const emailName = user?.email?.split("@")[0] ?? "User";
-  const displayName = metadataName || emailName;
-  const initials = getInitials(displayName) || "U";
+  const emailName =
+    user?.email?.split("@")[0] ?? "User";
+
+  const displayName =
+    metadataName || emailName;
+
+  const initials =
+    getInitials(displayName) || "U";
 
   async function signOut() {
     "use server";
@@ -35,6 +57,8 @@ export default async function SiteHeader() {
     const supabase = await createClient();
 
     await supabase.auth.signOut();
+
+    revalidatePath("/", "layout");
 
     redirect("/login");
   }
@@ -49,16 +73,19 @@ export default async function SiteHeader() {
           Impact Five
         </Link>
 
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center gap-3">
           <nav
             aria-label="Main navigation"
             className="flex items-center gap-2 overflow-x-auto"
           >
-            <NavigationLinks isSignedIn={Boolean(user)} />
+            <NavigationLinks
+              isSignedIn={Boolean(user)}
+              isAdmin={isAdmin}
+            />
           </nav>
 
           {user && (
-            <details className="group relative">
+            <details className="group relative shrink-0">
               <summary
                 aria-label="Open account menu"
                 className="flex cursor-pointer list-none items-center gap-3 rounded-full border border-slate-300 bg-white py-1.5 pl-1.5 pr-3 transition hover:border-emerald-600 hover:shadow-sm [&::-webkit-details-marker]:hidden"
@@ -94,24 +121,34 @@ export default async function SiteHeader() {
                       <p className="truncate text-sm text-slate-500">
                         {user.email}
                       </p>
+
+                      {isAdmin && (
+                        <p className="mt-1 text-xs font-bold uppercase tracking-wider text-emerald-700">
+                          Administrator
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 <div className="p-2">
-                  {/* <Link
-                    href="/dashboard"
-                    className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 hover:text-emerald-800"
-                  >
-                    View dashboard
-                  </Link>
+                  {isAdmin && (
+                    <>
+                      <Link
+                        href="/admin/draws"
+                        className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 hover:text-emerald-800"
+                      >
+                        Manage draws
+                      </Link>
 
-                  <Link
-                    href="/subscribe"
-                    className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 hover:text-emerald-800"
-                  >
-                    Manage membership
-                  </Link> */}
+                      <Link
+                        href="/admin/winners"
+                        className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 hover:text-emerald-800"
+                      >
+                        Review winners
+                      </Link>
+                    </>
+                  )}
 
                   <form action={signOut}>
                     <button

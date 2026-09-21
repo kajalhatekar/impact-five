@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 type NavigationLinksProps = {
   isSignedIn: boolean;
+  isAdmin: boolean;
 };
 
 type NavigationItem = {
@@ -22,12 +23,24 @@ const authenticatedItems: NavigationItem[] = [
     label: "Scores",
   },
   {
+    href: "/draws",
+    label: "Draws",
+  },
+  {
     href: "/charities",
     label: "Charities",
   },
   {
     href: "/subscribe",
     label: "Membership",
+  },
+];
+
+const adminItems: NavigationItem[] = [
+  ...authenticatedItems,
+  {
+    href: "/admin",
+    label: "Admin",
   },
 ];
 
@@ -48,16 +61,23 @@ const publicItems: NavigationItem[] = [
 
 export default function NavigationLinks({
   isSignedIn,
+  isAdmin,
 }: NavigationLinksProps) {
   const pathname = usePathname();
 
   const navigationItems = isSignedIn
-    ? authenticatedItems
+    ? isAdmin
+      ? adminItems
+      : authenticatedItems
     : publicItems;
 
   function isActive(href: string) {
     if (href === "/dashboard") {
       return pathname === "/dashboard";
+    }
+
+    if (href === "/admin") {
+      return pathname.startsWith("/admin");
     }
 
     return pathname === href || pathname.startsWith(`${href}/`);

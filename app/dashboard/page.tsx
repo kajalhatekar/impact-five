@@ -31,10 +31,13 @@ type Subscription = {
   razorpay_subscription_id: string | null;
 };
 
-function formatPrice(
-  pricePaise: number | null,
-  currency: string | null,
-) {
+type Winner = {
+  prize_paise: number;
+  verification_status: string;
+  payout_status: string;
+};
+
+function formatPrice(pricePaise: number | null, currency: string | null) {
   if (pricePaise === null) {
     return "₹0";
   }
@@ -106,24 +109,39 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const [charityResult, scoresResult, subscriptionResult] =
+  const [charityResult, scoresResult, subscriptionResult, winningsResult] =
     await Promise.all([
       supabase.rpc("get_my_charity_selection"),
       supabase.rpc("get_my_scores"),
       supabase.rpc("get_my_subscription"),
+      supabase
+        .from("draw_winners")
+        .select("prize_paise, verification_status, payout_status")
+        .eq("user_id", user.id)
+        .neq("verification_status", "rejected"),
     ]);
 
   /*
    * The RPC functions return arrays because they use RETURNS TABLE.
    * The first record is the current user's selection/subscription.
    */
-  const charityRows =
-    (charityResult.data as CharitySelection[] | null) ?? [];
+  const charityRows = (charityResult.data as CharitySelection[] | null) ?? [];
 
   const scoreRows = (scoresResult.data as Score[] | null) ?? [];
 
   const subscriptionRows =
     (subscriptionResult.data as Subscription[] | null) ?? [];
+
+  const winnerRows = (winningsResult.data as Winner[] | null) ?? [];
+
+  const totalWinningsPaise = winnerRows.reduce(
+    (total, winner) => total + winner.prize_paise,
+    0,
+  );
+
+  const totalWinnings = formatPrice(totalWinningsPaise, "INR");
+
+  const winnerCount = winnerRows.length;
 
   const charitySelection = charityRows[0] ?? null;
   const subscription = subscriptionRows[0] ?? null;
@@ -133,14 +151,12 @@ export default async function DashboardPage() {
    * Safe charity values.
    * JSX below never accesses charitySelection directly.
    */
-  const selectedCharityId =
-    charitySelection?.charity_id ?? null;
+  const selectedCharityId = charitySelection?.charity_id ?? null;
 
   const selectedCharityName =
     charitySelection?.charity_name ?? "No charity selected";
 
-  const selectedCharityPercentage =
-    charitySelection?.charity_percentage ?? 0;
+  const selectedCharityPercentage = charitySelection?.charity_percentage ?? 0;
 
   const hasCharitySelection = selectedCharityId !== null;
 
@@ -154,17 +170,15 @@ export default async function DashboardPage() {
   /*
    * Safe subscription values.
    */
-  const subscriptionStatus =
-    subscription?.subscription_status ?? "inactive";
+  const subscriptionStatus = subscription?.subscription_status ?? "inactive";
 
- const isSubscriptionActive =
-  ["active", "trialing"].includes(subscriptionStatus);
+  const isSubscriptionActive = ["active", "trialing"].includes(
+    subscriptionStatus,
+  );
 
-  const subscriptionPlanName =
-    subscription?.plan_name ?? "Membership";
+  const subscriptionPlanName = subscription?.plan_name ?? "Membership";
 
-  const subscriptionPlanCode =
-    subscription?.plan_code ?? null;
+  const subscriptionPlanCode = subscription?.plan_code ?? null;
 
   const subscriptionPrice = formatPrice(
     subscription?.price_paise ?? null,
@@ -172,29 +186,20 @@ export default async function DashboardPage() {
   );
 
   const billingInterval =
-    subscription?.billing_interval === "year"
-      ? "year"
-      : "month";
+    subscription?.billing_interval === "year" ? "year" : "month";
 
-  const renewalDate = formatDate(
-    subscription?.current_period_end ?? null,
-  );
+  const renewalDate = formatDate(subscription?.current_period_end ?? null);
 
-  const cancelAtPeriodEnd =
-    subscription?.cancel_at_period_end ?? false;
+  const cancelAtPeriodEnd = subscription?.cancel_at_period_end ?? false;
 
   const isDemoSubscription =
-    subscription?.razorpay_subscription_id?.startsWith(
-      "demo_",
-    ) ?? false;
+    subscription?.razorpay_subscription_id?.startsWith("demo_") ?? false;
 
   /*
    * A user is eligible only when all three requirements are complete.
    */
   const isDrawEligible =
-    hasFiveScores &&
-    hasCharitySelection &&
-    isSubscriptionActive;
+    hasFiveScores && hasCharitySelection && isSubscriptionActive;
 
   const fullName =
     typeof user.user_metadata?.full_name === "string"
@@ -202,14 +207,13 @@ export default async function DashboardPage() {
       : "";
 
   const firstName =
-    fullName.trim().split(" ")[0] ||
-    user.email?.split("@")[0] ||
-    "there";
+    fullName.trim().split(" ")[0] || user.email?.split("@")[0] || "there";
 
   const loadError =
     charityResult.error?.message ??
     scoresResult.error?.message ??
     subscriptionResult.error?.message ??
+    winningsResult.error?.message ??
     null;
 
   return (
@@ -225,8 +229,8 @@ export default async function DashboardPage() {
           </h1>
 
           <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-600">
-            Track your scores, manage your charity contribution
-            and follow your monthly prize-draw participation.
+            Track your scores, manage your charity contribution and follow your
+            monthly prize-draw participation.
           </p>
         </section>
 
@@ -251,18 +255,14 @@ export default async function DashboardPage() {
             </p>
 
             <p className="mt-1 text-xl font-bold text-slate-950">
-              {isSubscriptionActive
-                ? subscriptionPlanName
-                : "Not active"}
+              {isSubscriptionActive ? subscriptionPlanName : "Not active"}
             </p>
 
             {isSubscriptionActive ? (
               <>
                 <p className="mt-3 text-sm leading-6 text-slate-500">
                   {subscriptionPrice}/{billingInterval}
-                  {renewalDate
-                    ? ` · Renews ${renewalDate}`
-                    : ""}
+                  {renewalDate ? ` · Renews ${renewalDate}` : ""}
                 </p>
 
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -293,8 +293,7 @@ export default async function DashboardPage() {
             ) : (
               <>
                 <p className="mt-3 text-sm leading-6 text-slate-500">
-                  Choose a monthly or yearly plan to participate
-                  in draws.
+                  Choose a monthly or yearly plan to participate in draws.
                 </p>
 
                 <Link
@@ -325,9 +324,7 @@ export default async function DashboardPage() {
               {hasFiveScores
                 ? "Your latest five Stableford scores are recorded."
                 : `Add ${remainingScoreCount} more ${
-                    remainingScoreCount === 1
-                      ? "score"
-                      : "scores"
+                    remainingScoreCount === 1 ? "score" : "scores"
                   } to complete your latest five.`}
             </p>
 
@@ -373,8 +370,7 @@ export default async function DashboardPage() {
                 </p>
 
                 <p className="mt-3 text-sm leading-6 text-slate-500">
-                  Choose a charity and direct at least 10% of
-                  your subscription.
+                  Choose a charity and direct at least 10% of your subscription.
                 </p>
 
                 <Link
@@ -398,17 +394,29 @@ export default async function DashboardPage() {
             </p>
 
             <p className="mt-1 text-xl font-bold text-slate-950">
-              ₹0
+              {totalWinnings}
             </p>
 
             <p className="mt-3 text-sm leading-6 text-slate-500">
-              Your winnings and payment status will appear
-              here.
+              {winnerCount > 0
+                ? `${winnerCount} ${
+                    winnerCount === 1 ? "prize" : "prizes"
+                  } recorded. View your draw results for verification and payment status.`
+                : "Your winnings and payment status will appear here."}
             </p>
 
-            <span className="mt-5 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-              No winnings yet
-            </span>
+            {winnerCount > 0 ? (
+              <Link
+                href="/draws"
+                className="mt-5 inline-flex text-sm font-semibold text-emerald-700 transition hover:text-emerald-900"
+              >
+                View draw results →
+              </Link>
+            ) : (
+              <span className="mt-5 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                No winnings yet
+              </span>
+            )}
           </article>
         </section>
 
@@ -431,8 +439,7 @@ export default async function DashboardPage() {
                     <strong className="text-white">
                       {selectedCharityPercentage}%
                     </strong>{" "}
-                    of your subscription contribution towards
-                    this charity.
+                    of your subscription contribution towards this charity.
                   </p>
 
                   <div className="mt-7">
@@ -450,10 +457,7 @@ export default async function DashboardPage() {
                         style={{
                           width: `${Math.min(
                             100,
-                            Math.max(
-                              0,
-                              selectedCharityPercentage,
-                            ),
+                            Math.max(0, selectedCharityPercentage),
                           )}%`,
                         }}
                       />
@@ -474,9 +478,8 @@ export default async function DashboardPage() {
                   </h2>
 
                   <p className="mt-4 max-w-xl leading-7 text-emerald-100">
-                    Select one of our charity partners and
-                    choose a contribution percentage of at least
-                    10%.
+                    Select one of our charity partners and choose a contribution
+                    percentage of at least 10%.
                   </p>
 
                   <Link
@@ -496,9 +499,7 @@ export default async function DashboardPage() {
               Monthly draw
             </p>
 
-            <h2 className="mt-4 text-2xl font-bold">
-              Participation status
-            </h2>
+            <h2 className="mt-4 text-2xl font-bold">Participation status</h2>
 
             <div className="mt-6 space-y-4">
               <RequirementRow
@@ -525,8 +526,7 @@ export default async function DashboardPage() {
                 </p>
 
                 <p className="mt-1 text-sm leading-6 text-emerald-700">
-                  Your scores, charity selection and membership
-                  are complete.
+                  Your scores, charity selection and membership are complete.
                 </p>
               </div>
             ) : (
@@ -536,8 +536,8 @@ export default async function DashboardPage() {
                 </p>
 
                 <p className="mt-1 text-sm leading-6 text-amber-700">
-                  Draw participation activates after all three
-                  requirements are complete.
+                  Draw participation activates after all three requirements are
+                  complete.
                 </p>
               </div>
             )}
