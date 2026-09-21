@@ -107,24 +107,25 @@ export async function POST(request: Request) {
 
     const demoSubscriptionId = `demo_${randomUUID()}`;
 
-    const { error: subscriptionError } = await admin
-      .from("subscriptions")
-      .upsert(
-        {
-          user_id: user.id,
-          plan_id: plan.id,
-          razorpay_customer_id: null,
-          razorpay_subscription_id: demoSubscriptionId,
-          status: "active",
-          current_period_start: periodStart.toISOString(),
-          current_period_end: periodEnd.toISOString(),
-          cancel_at_period_end: false,
-          canceled_at: null,
-        },
-        {
-          onConflict: "user_id",
-        },
-      );
+const { error: subscriptionError } = await admin
+  .from("subscriptions")
+  .upsert(
+    {
+      user_id: user.id,
+      plan_id: plan.id,
+      razorpay_customer_id: null,
+      razorpay_subscription_id: demoSubscriptionId,
+      payment_provider: "demo",
+      status: "active",
+      current_period_start: periodStart.toISOString(),
+      current_period_end: periodEnd.toISOString(),
+      cancel_at_period_end: false,
+      canceled_at: null,
+    },
+    {
+      onConflict: "user_id",
+    },
+  );
 
     if (subscriptionError) {
       console.error(
