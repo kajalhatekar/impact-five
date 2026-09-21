@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   useEffect,
@@ -227,41 +226,6 @@ export default function CharitiesPage() {
 
   return (
     <main className="min-h-screen bg-[#f5f1e8] text-slate-950">
-      <header className="border-b border-slate-200 bg-[#f5f1e8]/95">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
-          <Link
-            href="/"
-            className="text-lg font-black uppercase tracking-[0.16em] text-emerald-800"
-          >
-            Impact Five
-          </Link>
-
-          <nav className="flex items-center gap-4">
-            {userId ? (
-              <Link
-                href="/dashboard"
-                className="text-sm font-semibold text-slate-700 transition hover:text-emerald-700"
-              >
-                Dashboard
-              </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="text-sm font-semibold text-slate-700 transition hover:text-emerald-700"
-              >
-                Sign in
-              </Link>
-            )}
-
-            <Link
-              href={userId ? "/dashboard" : "/signup"}
-              className="rounded-full bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800"
-            >
-              {userId ? "My account" : "Join the impact"}
-            </Link>
-          </nav>
-        </div>
-      </header>
 
       <section className="px-4 pb-14 pt-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
