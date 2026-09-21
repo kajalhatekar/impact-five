@@ -135,6 +135,9 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
+  const { error: subscriptionRefreshError } =
+    await supabase.rpc("refresh_my_subscription_status");
+
   const [
     profileResult,
     charityResult,
@@ -276,6 +279,7 @@ export default async function DashboardPage() {
     fullName.split(" ")[0] || user.email?.split("@")[0] || "there";
 
   const loadError =
+    subscriptionRefreshError?.message ??
     profileResult.error?.message ??
     charityResult.error?.message ??
     scoresResult.error?.message ??

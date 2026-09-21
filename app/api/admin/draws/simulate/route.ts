@@ -16,6 +16,7 @@ type SimulationBody = {
 type SubscriptionRow = {
   user_id: string;
   plan_id: string;
+  current_period_end: string | null;
 };
 
 type PlanRow = {
@@ -286,10 +287,13 @@ export async function POST(request: Request) {
       );
     }
 
+    const currentTime = new Date().toISOString();
+
     const { data: subscriptionData, error: subscriptionError } = await admin
       .from("subscriptions")
-      .select("user_id, plan_id")
-      .in("status", ["active", "trialing"]);
+      .select("user_id, plan_id, current_period_end")
+      .in("status", ["active", "trialing"])
+      .gt("current_period_end", currentTime);
 
     if (subscriptionError) {
       console.error("Unable to load active subscriptions:", subscriptionError);

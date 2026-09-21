@@ -22,6 +22,9 @@ export default async function SubscribePage() {
     redirect("/login");
   }
 
+  const { error: subscriptionRefreshError } =
+    await supabase.rpc("refresh_my_subscription_status");
+
   const [plansResult, subscriptionResult] = await Promise.all([
     supabase.rpc("get_subscription_plans"),
     supabase.rpc("get_my_subscription"),
@@ -95,13 +98,14 @@ export default async function SubscribePage() {
         </div>
 
         <div className="mt-12">
-          {subscriptionResult.error ? (
+          {subscriptionRefreshError || subscriptionResult.error ? (
             <div
               role="alert"
               className="rounded-2xl border border-red-200 bg-red-50 p-5 text-red-800"
             >
               Unable to load your membership:{" "}
-              {subscriptionResult.error.message}
+              {subscriptionRefreshError?.message ??
+                subscriptionResult.error?.message}
             </div>
           ) : hasActiveSubscription &&
             currentSubscription !== null ? (

@@ -170,6 +170,7 @@ export async function POST(request: Request) {
       .from("subscriptions")
       .update({
         razorpay_customer_id: customerId,
+        payment_provider: "razorpay",
         status: subscriptionStatus,
         current_period_start: currentPeriodStart,
         current_period_end: currentPeriodEnd,

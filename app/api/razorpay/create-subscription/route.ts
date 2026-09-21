@@ -113,6 +113,7 @@ export async function POST(request: Request) {
           plan_id: plan.id,
           razorpay_customer_id: null,
           razorpay_subscription_id: razorpaySubscription.id,
+          payment_provider: "razorpay",
           status: "incomplete",
           current_period_start: null,
           current_period_end: null,
