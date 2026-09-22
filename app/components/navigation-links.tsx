@@ -40,6 +40,10 @@ const authenticatedItems: NavigationItem[] = [
     label: "Charities",
   },
   {
+    href: "/donate",
+    label: "Donate",
+  },
+  {
     href: "/subscribe",
     label: "Membership",
   },
@@ -57,6 +61,10 @@ const publicItems: NavigationItem[] = [
   {
     href: "/charities",
     label: "Charities",
+  },
+  {
+    href: "/donate",
+    label: "Donate",
   },
   {
     href: "/login",

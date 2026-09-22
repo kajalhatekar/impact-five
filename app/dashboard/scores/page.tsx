@@ -18,6 +18,10 @@ type Feedback = {
   text: string;
 } | null;
 
+type Subscription = {
+  subscription_status: string | null;
+};
+
 function getTodayForDateInput() {
   const now = new Date();
   const timezoneOffset = now.getTimezoneOffset() * 60_000;
@@ -41,6 +45,8 @@ export default function ScoresPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [isSubscriptionActive, setIsSubscriptionActive] =
+    useState(false);
 
   useEffect(() => {
     let isActive = true;
@@ -57,6 +63,63 @@ export default function ScoresPage() {
 
       if (userError || !user) {
         router.replace("/login");
+        return;
+      }
+
+      const { error: subscriptionRefreshError } =
+        await supabase.rpc("refresh_my_subscription_status");
+
+      if (!isActive) {
+        return;
+      }
+
+      if (subscriptionRefreshError) {
+        setFeedback({
+          type: "error",
+          text: subscriptionRefreshError.message,
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      const {
+        data: subscriptionData,
+        error: subscriptionError,
+      } = await supabase.rpc("get_my_subscription");
+
+      if (!isActive) {
+        return;
+      }
+
+      if (subscriptionError) {
+        setFeedback({
+          type: "error",
+          text: subscriptionError.message,
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      const subscriptions =
+        (subscriptionData as Subscription[] | null) ?? [];
+
+      const subscriptionStatus =
+        subscriptions[0]?.subscription_status ?? "inactive";
+
+      const hasActiveSubscription = [
+        "active",
+        "trialing",
+      ].includes(subscriptionStatus);
+
+      setIsSubscriptionActive(hasActiveSubscription);
+
+      if (!hasActiveSubscription) {
+        setFeedback({
+          type: "error",
+          text: "An active membership is required to manage scores.",
+        });
+        setScores([]);
+        setIsLoading(false);
         return;
       }
 
@@ -109,6 +172,14 @@ export default function ScoresPage() {
   async function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     setFeedback(null);
+
+    if (!isSubscriptionActive) {
+      setFeedback({
+        type: "error",
+        text: "An active membership is required to manage scores.",
+      });
+      return;
+    }
 
     const numericScore = Number(score);
 
@@ -364,7 +435,7 @@ export default function ScoresPage() {
 
               <button
                 type="submit"
-                disabled={isSaving}
+                disabled={isSaving || !isSubscriptionActive}
                 className="w-full rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white transition hover:bg-emerald-800 focus:outline-none focus:ring-4 focus:ring-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSaving

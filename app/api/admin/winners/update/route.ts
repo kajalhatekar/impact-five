@@ -151,13 +151,14 @@ export async function PATCH(request: Request) {
     }
 
     if (
-      verificationStatus === "approved" &&
+      verificationStatus &&
+      verificationStatus !== "pending" &&
       !winner.proof_storage_path
     ) {
       return NextResponse.json(
         {
           error:
-            "The winner must submit proof before approval.",
+            "The winner must submit proof before review.",
         },
         {
           status: 400,

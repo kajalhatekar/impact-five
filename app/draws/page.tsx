@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { PageContainer } from "@/app/components/page-container";
 import { createClient } from "@/lib/supabase/server";
+import { getMembershipAccess } from "@/lib/subscriptions/access";
 import WinnerProofUpload from "./winner-proof-upload";
 
 type PublishedDraw = {
@@ -94,14 +95,38 @@ function formatStatus(status: string) {
 export default async function DrawResultsPage() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+  const membershipAccess =
+    await getMembershipAccess(supabase);
 
-  if (userError || !user) {
+  if (!membershipAccess.user) {
     redirect("/login");
   }
+
+  if (membershipAccess.error) {
+    return (
+      <PageContainer>
+        <Link
+          href="/dashboard"
+          className="font-semibold text-emerald-700 transition hover:text-emerald-900"
+        >
+          â† Back to dashboard
+        </Link>
+
+        <div
+          role="alert"
+          className="mt-8 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-red-800"
+        >
+          Unable to verify membership access: {membershipAccess.error}
+        </div>
+      </PageContainer>
+    );
+  }
+
+  if (!membershipAccess.isActive) {
+    redirect("/subscribe");
+  }
+
+  const user = membershipAccess.user;
 
   const [
     { data: drawData, error: drawError },

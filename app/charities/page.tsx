@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   useEffect,
@@ -33,6 +34,20 @@ type Feedback = {
   text: string;
 } | null;
 
+function isUsableWebsiteUrl(value: string | null) {
+  if (!value) {
+    return false;
+  }
+
+  try {
+    const url = new URL(value);
+
+    return !url.hostname.endsWith("example.com");
+  } catch {
+    return false;
+  }
+}
+
 function CharityImageFallback({
   charity,
   variant = "card",
@@ -44,18 +59,24 @@ function CharityImageFallback({
   const summary =
     charity.impact_summary ?? charity.upcoming_event ?? charity.description;
   const titleClasses = isFeatured
-    ? "max-w-md text-5xl font-black leading-none text-white sm:text-6xl"
-    : "max-w-md text-3xl font-black leading-none text-emerald-950";
+    ? "max-w-lg text-4xl font-black leading-[1.05] text-white sm:text-5xl"
+    : "max-w-md text-3xl font-black leading-none text-white";
 
   return (
     <div
       className={`relative flex h-full min-h-full overflow-hidden ${
         isFeatured
           ? "bg-[linear-gradient(135deg,#059669,#047857_52%,#064e3b)] p-8 sm:p-10"
-          : "bg-[linear-gradient(135deg,#ecfdf5,#bbf7d0_52%,#86efac)] p-5"
+          : "bg-[linear-gradient(135deg,#10b981,#059669_52%,#047857)] p-5"
       }`}
     >
-      <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.42),transparent_42%)]" />
+      <div
+        className={`absolute inset-0 ${
+          isFeatured
+            ? "bg-[linear-gradient(115deg,rgba(255,255,255,0.42),transparent_42%)]"
+            : "bg-[linear-gradient(115deg,rgba(255,255,255,0.18),transparent_42%)]"
+        }`}
+      />
       <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white/30 to-transparent" />
       {isFeatured && (
         <>
@@ -67,7 +88,7 @@ function CharityImageFallback({
 
       <div
         className={`relative z-10 flex w-full flex-col justify-between ${
-          isFeatured ? "min-h-96" : "min-h-28"
+          isFeatured ? "min-h-80" : "min-h-28"
         }`}
       >
         <div>
@@ -75,7 +96,7 @@ function CharityImageFallback({
             className={`inline-flex rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] ${
               isFeatured
                 ? "bg-white/20 text-white"
-                : "bg-white/65 text-emerald-800"
+                : "bg-white/20 text-white"
             }`}
           >
             {charity.category}
@@ -305,6 +326,13 @@ export default function CharitiesPage() {
                 Choose a cause that matters to you and direct at least 10% of
                 your subscription contribution towards its work.
               </p>
+
+              <Link
+                href="/donate"
+                className="mt-6 inline-flex rounded-full border border-slate-400 bg-white px-6 py-3 text-sm font-semibold text-slate-800 transition hover:border-emerald-700 hover:text-emerald-800"
+              >
+                Donate independently
+              </Link>
             </div>
 
             {selection?.charity_id && (
@@ -376,6 +404,20 @@ export default function CharitiesPage() {
                     ? "Update contribution"
                     : "Support this charity"}
                 </button>
+
+                <Link
+                  href={`/charities/${featuredCharity.id}`}
+                  className="mt-4 inline-flex w-fit text-sm font-semibold text-emerald-200 transition hover:text-white"
+                >
+                  View charity details -&gt;
+                </Link>
+
+                <Link
+                  href={`/donate?charity=${featuredCharity.id}`}
+                  className="mt-4 inline-flex w-fit text-sm font-semibold text-emerald-200 transition hover:text-white"
+                >
+                  Donate independently -&gt;
+                </Link>
               </div>
             </div>
           </div>
@@ -463,6 +505,10 @@ export default function CharitiesPage() {
 
                 const isChoosing =
                   selectedCharityId === charity.id;
+
+                const websiteUrl = isUsableWebsiteUrl(charity.website_url)
+                  ? charity.website_url
+                  : null;
 
                 return (
                   <article
@@ -582,27 +628,38 @@ export default function CharitiesPage() {
                           </div>
                         </div>
                       ) : (
-                        <div className="mt-auto flex items-center gap-3 pt-5">
+                        <div className="mt-auto space-y-3 pt-5">
                           <button
                             type="button"
                             onClick={() => openSelectionForm(charity)}
-                            className="flex-1 rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800"
+                            className="w-full rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800"
                           >
                             {isSelected
                               ? `Update ${selection.charity_percentage}%`
                               : "Choose this charity"}
                           </button>
 
-                          {charity.website_url && (
-                            <a
-                              href={charity.website_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                          <div className="grid grid-cols-2 gap-3">
+                            <Link
+                              href={`/charities/${charity.id}`}
+                              className="rounded-xl border border-slate-400 px-4 py-2.5 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
                             >
-                              Visit
-                            </a>
-                          )}
+                              Details
+                            </Link>
+
+                            {websiteUrl ? (
+                              <a
+                                href={websiteUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="rounded-xl border border-slate-400 px-4 py-2.5 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                              >
+                                Visit
+                              </a>
+                            ) : (
+                              <span aria-hidden="true" />
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>

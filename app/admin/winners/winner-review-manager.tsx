@@ -67,6 +67,24 @@ function formatCurrency(paise: number) {
   }).format(paise / 100);
 }
 
+function formatDate(date: string | null) {
+  if (!date) {
+    return null;
+  }
+
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(parsedDate);
+}
+
 function formatStatus(status: string) {
   return status
     .replaceAll("_", " ")
@@ -274,6 +292,7 @@ export default function WinnerReviewManager({
                     </p>
 
                     {winner.proofUrl ? (
+                      <>
                       <a
                         href={winner.proofUrl}
                         target="_blank"
@@ -282,6 +301,13 @@ export default function WinnerReviewManager({
                       >
                         View submitted proof ↗
                       </a>
+                      <p className="mt-3 text-sm text-slate-500">
+                        Submitted{" "}
+                        {formatDate(
+                          winner.proofSubmittedAt,
+                        ) ?? "recently"}
+                      </p>
+                      </>
                     ) : (
                       <p className="mt-3 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">
                         The winner has not submitted proof yet.
