@@ -18,7 +18,17 @@ type Feedback = {
   text: string;
 } | null;
 
+function getTodayForDateInput() {
+  const now = new Date();
+  const timezoneOffset = now.getTimezoneOffset() * 60_000;
+
+  return new Date(now.getTime() - timezoneOffset)
+    .toISOString()
+    .slice(0, 10);
+}
+
 export default function ScoresPage() {
+  const today = getTodayForDateInput();
   const router = useRouter();
   const [supabase] = useState(() => createClient());
 
@@ -122,6 +132,14 @@ export default function ScoresPage() {
       setFeedback({
         type: "error",
         text: "Please select the date the round was played.",
+      });
+      return;
+    }
+
+    if (playedOn > today) {
+      setFeedback({
+        type: "error",
+        text: "The date played cannot be in the future.",
       });
       return;
     }
@@ -336,6 +354,7 @@ export default function ScoresPage() {
                   id="playedOn"
                   name="playedOn"
                   type="date"
+                  max={today}
                   required
                   value={playedOn}
                   onChange={(event) => setPlayedOn(event.target.value)}

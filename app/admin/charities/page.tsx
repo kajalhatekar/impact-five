@@ -4,18 +4,15 @@ import { redirect } from "next/navigation";
 import { PageContainer } from "@/app/components/page-container";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import CharityManager, {
+  type AdminCharityRecord,
+} from "./charity-manager";
 
 type ProfileRecord = {
   id: string;
   full_name: string | null;
   selected_charity_id: string | null;
   charity_percentage: number | null;
-};
-
-type CharityRecord = {
-  id: string;
-  name: string;
-  category: string | null;
 };
 
 type SubscriptionRecord = {
@@ -36,7 +33,7 @@ type ContributionRecord = {
   userId: string;
   userName: string;
   charityName: string;
-  charityCategory: string | null;
+  charityCategory: string;
   percentage: number;
   planName: string;
   billingInterval: string;
@@ -109,7 +106,21 @@ export default async function AdminCharitiesPage() {
 
     admin
       .from("charities")
-      .select("id, name, category")
+      .select(
+        `
+          id,
+          name,
+          description,
+          image_url,
+          website_url,
+          is_featured,
+          is_active,
+          created_at,
+          category,
+          upcoming_event,
+          impact_summary
+        `,
+      )
       .order("name"),
 
     admin
@@ -140,7 +151,9 @@ export default async function AdminCharitiesPage() {
     (profilesResult.data as ProfileRecord[] | null) ?? [];
 
   const charities =
-    (charitiesResult.data as CharityRecord[] | null) ?? [];
+    (charitiesResult.data as
+      | AdminCharityRecord[]
+      | null) ?? [];
 
   const subscriptions =
     (subscriptionsResult.data as
@@ -302,6 +315,8 @@ export default async function AdminCharitiesPage() {
           </div>
         ) : (
           <>
+            <CharityManager initialCharities={charities} />
+
             <div className="mt-8 grid gap-5 sm:grid-cols-3">
               <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                 <p className="text-sm font-semibold text-slate-500">
