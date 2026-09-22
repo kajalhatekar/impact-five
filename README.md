@@ -57,7 +57,7 @@ Administrators can manage members, scores, subscriptions, charities, draws, winn
 
 ```bash
 git clone <repository-url>
-cd fairway-forward
+cd impact-five
 ```
 
 ### 2. Install dependencies
