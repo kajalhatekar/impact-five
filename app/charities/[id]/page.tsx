@@ -42,6 +42,13 @@ function isUsableWebsiteUrl(value: string | null) {
   }
 }
 
+/**
+ * Public detail page for a single active charity.
+ *
+ * The page shows richer charity information, highlights the current member's
+ * selected percentage when applicable and keeps independent donations separate
+ * from subscription contribution selection.
+ */
 export default async function CharityDetailPage({
   params,
 }: CharityDetailPageProps) {

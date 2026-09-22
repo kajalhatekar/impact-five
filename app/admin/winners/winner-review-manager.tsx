@@ -120,6 +120,12 @@ function getPayoutClasses(status: string) {
   }
 }
 
+/**
+ * Admin review surface for winner verification and payout tracking.
+ *
+ * Proof approval must happen before payout status changes, and rejected proofs
+ * reset payout progress so the subscriber can upload a replacement document.
+ */
 export default function WinnerReviewManager({
   initialWinners,
 }: WinnerReviewManagerProps) {

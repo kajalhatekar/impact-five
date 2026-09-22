@@ -104,6 +104,12 @@ function getStatusClasses(status: string | null) {
   }
 }
 
+/**
+ * Admin member directory with subscription context.
+ *
+ * Combines Supabase Auth users with profile, subscription and plan rows so
+ * admins can review access state and jump into member-specific management.
+ */
 export default async function AdminMembersPage() {
   const supabase = await createClient();
 

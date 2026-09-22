@@ -21,6 +21,12 @@ const features = [
   },
 ];
 
+/**
+ * Public landing page for the platform.
+ *
+ * This page introduces the score-tracking, charity-selection and monthly-draw
+ * value proposition, then routes visitors either into signup or charity browsing.
+ */
 export default function Home() {
   return (
     <main className="bg-[#f4f1e9] text-slate-950">

@@ -92,6 +92,12 @@ function formatStatus(status: string) {
     );
 }
 
+/**
+ * Member draw-results page.
+ *
+ * Active members can review published draws, see the frozen score snapshot used
+ * for each draw and manage winner proof when their entry qualifies for a prize.
+ */
 export default async function DrawResultsPage() {
   const supabase = await createClient();
 
@@ -207,7 +213,7 @@ export default async function DrawResultsPage() {
     ]),
   );
 
-  const winnerByDrawId = new Map(
+              const winnerByDrawId = new Map(
     winners.map((winner) => [
       winner.draw_id,
       winner,

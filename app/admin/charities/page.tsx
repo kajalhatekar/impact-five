@@ -65,6 +65,12 @@ function formatInterval(interval: string) {
   return interval;
 }
 
+/**
+ * Admin charity report and management page.
+ *
+ * Shows contribution analytics alongside the CRUD manager so admins can update
+ * charity content and immediately review how active subscriptions allocate funds.
+ */
 export default async function AdminCharitiesPage() {
   const supabase = await createClient();
 

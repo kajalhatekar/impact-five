@@ -61,6 +61,12 @@ function formatDate(value: string | null) {
   }).format(parsedDate);
 }
 
+/**
+ * Client controls for an existing active membership.
+ *
+ * Cancellation is scheduled for the current period end so access remains active
+ * until renewal, while demo memberships can also be reactivated in-app.
+ */
 export default function MembershipManager({
   subscription,
 }: MembershipManagerProps) {

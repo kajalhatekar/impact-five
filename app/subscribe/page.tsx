@@ -10,6 +10,12 @@ import SubscriptionCheckout, {
 } from "./subscription-checkout";
 import MembershipManager, { CurrentSubscription } from "./membership-manager";
 
+/**
+ * Membership route for subscribing or managing an existing plan.
+ *
+ * The page refreshes subscription status before rendering so users with active
+ * or trialing access see management controls, while inactive users see checkout.
+ */
 export default async function SubscribePage() {
   const supabase = await createClient();
 

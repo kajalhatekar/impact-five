@@ -19,6 +19,12 @@ type UploadResponse = {
   error?: string;
 };
 
+/**
+ * Subscriber-side proof upload for draw winners.
+ *
+ * Uploads are only useful while verification is pending or rejected; approved
+ * or paid prizes are locked so winners cannot replace proof after completion.
+ */
 export default function WinnerProofUpload({
   winnerId,
   verificationStatus,

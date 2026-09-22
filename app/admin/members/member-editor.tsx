@@ -20,6 +20,12 @@ type UpdateMemberResponse = {
   error?: string;
 };
 
+/**
+ * Inline admin editor for member profile name and role.
+ *
+ * The current administrator cannot change their own role here, preventing an
+ * accidental self-demotion that could remove access to admin controls.
+ */
 export default function MemberEditor({
   userId,
   initialFullName,

@@ -68,6 +68,12 @@ function sortCharities(
   );
 }
 
+/**
+ * Admin CRUD interface for charity directory content.
+ *
+ * Keeps the local list responsive after create/update/delete calls while the
+ * API route enforces admin permissions and validates persisted charity fields.
+ */
 export default function CharityManager({
   initialCharities,
 }: CharityManagerProps) {

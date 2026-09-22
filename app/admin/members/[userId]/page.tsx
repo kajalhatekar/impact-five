@@ -48,6 +48,12 @@ function formatDate(value: string) {
   }).format(parsedDate);
 }
 
+/**
+ * Admin detail page for one member.
+ *
+ * Loads the selected user's auth profile, subscription and score history so
+ * admins can resolve support issues without switching to the member account.
+ */
 export default async function AdminMemberPage({
   params,
 }: AdminMemberPageProps) {

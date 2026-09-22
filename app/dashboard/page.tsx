@@ -123,6 +123,12 @@ function RequirementRow({
   );
 }
 
+/**
+ * Member dashboard summary for subscription, score, charity and draw status.
+ *
+ * The page aggregates several Supabase RPCs into one eligibility view so members
+ * can see exactly which requirements are complete before monthly draw entry.
+ */
 export default async function DashboardPage() {
   const supabase = await createClient();
 
@@ -258,7 +264,8 @@ export default async function DashboardPage() {
     subscription?.razorpay_subscription_id?.startsWith("demo_") ?? false;
 
   /*
-   * A user is eligible only when all three requirements are complete.
+   * Draw eligibility is intentionally strict: members need the latest five
+   * scores, a selected charity and an active/trialing subscription.
    */
   const isDrawEligible =
     hasFiveScores && hasCharitySelection && isSubscriptionActive;

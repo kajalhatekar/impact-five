@@ -29,6 +29,13 @@ function formatDate(value: string | null) {
   }).format(new Date(value));
 }
 
+/**
+ * Member account settings page.
+ *
+ * Lets authenticated users update display profile information and password
+ * without requiring an active subscription, since account access must remain
+ * available for security and profile maintenance.
+ */
 export default async function AccountPage({
   searchParams,
 }: AccountPageProps) {

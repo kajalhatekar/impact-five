@@ -75,6 +75,12 @@ function formatStatus(status: string) {
     .replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
+/**
+ * Admin overview and combined reporting dashboard.
+ *
+ * Collects platform-wide member, charity, draw and winner data with the service
+ * role client after verifying admin access through the authenticated session.
+ */
 export default async function AdminPage() {
   const supabase = await createClient();
 
@@ -186,6 +192,10 @@ export default async function AdminPage() {
     }
   >();
 
+  /*
+   * Convert each active subscription's selected charity percentage into a
+   * monthly equivalent so monthly and yearly plans can be reported together.
+   */
   for (const profile of profiles) {
     if (!profile.selected_charity_id) {
       continue;

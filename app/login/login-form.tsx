@@ -6,6 +6,12 @@ import { useRouter } from "next/navigation";
 import { PasswordInput } from "@/app/components/password-input";
 import { createClient } from "@/lib/supabase/client";
 
+/**
+ * Client-side credential form for Supabase password login.
+ *
+ * Successful authentication replaces the login route with the dashboard and
+ * refreshes server components so the header immediately reflects the session.
+ */
 export default function LoginForm() {
   const router = useRouter();
   const supabase = createClient();

@@ -106,6 +106,12 @@ function getStatusClasses(status: DrawRecord["status"]) {
   }
 }
 
+/**
+ * Admin draw simulation and publishing manager.
+ *
+ * Simulations create a reviewable draw snapshot; publishing is a separate
+ * confirmation step because published results become visible to members.
+ */
 export default function DrawManager({
   initialDraws,
 }: DrawManagerProps) {

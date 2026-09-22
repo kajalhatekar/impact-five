@@ -5,6 +5,12 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 
+/**
+ * Updates the signed-in user's profile name from the account page.
+ *
+ * Redirect responses carry validation or success messages back to the page,
+ * while revalidation refreshes dashboard/header displays that show the name.
+ */
 export async function updateProfileAction(formData: FormData) {
   const fullName = String(formData.get("fullName") ?? "").trim();
 
@@ -53,6 +59,12 @@ export async function updateProfileAction(formData: FormData) {
   redirect("/account?success=profile");
 }
 
+/**
+ * Updates the signed-in user's Supabase password.
+ *
+ * Password confirmation is checked server-side before calling Supabase Auth so
+ * the account page can use a simple form without exposing client-only logic.
+ */
 export async function updatePasswordAction(formData: FormData) {
   const password = String(formData.get("password") ?? "");
   const confirmPassword = String(

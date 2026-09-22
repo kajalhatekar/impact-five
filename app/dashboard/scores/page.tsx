@@ -31,6 +31,13 @@ function getTodayForDateInput() {
     .slice(0, 10);
 }
 
+/**
+ * Member score-management page.
+ *
+ * Active members can add, edit and delete Stableford scores through Supabase
+ * RPCs. The form keeps the client-side validation aligned with draw rules:
+ * whole-number scores from 1-45, no future dates and only subscribed users.
+ */
 export default function ScoresPage() {
   const today = getTodayForDateInput();
   const router = useRouter();
@@ -124,8 +131,8 @@ export default function ScoresPage() {
       }
 
       /*
-       * Scores are loaded through the secure Supabase function.
-       * This avoids the previous RLS problem.
+       * Scores are loaded through the secure Supabase function so users only
+       * receive their own latest score records.
        */
       const { data, error } = await supabase.rpc("get_my_scores");
 

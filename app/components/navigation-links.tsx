@@ -76,6 +76,12 @@ const publicItems: NavigationItem[] = [
   },
 ];
 
+/**
+ * Renders the correct navigation set for public visitors, members and admins.
+ *
+ * The active route indicator is measured on the client so desktop and mobile
+ * menus share the same link logic while keeping the animated pill aligned.
+ */
 export default function NavigationLinks({
   isSignedIn,
   isAdmin,

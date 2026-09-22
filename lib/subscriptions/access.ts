@@ -8,6 +8,12 @@ type SubscriptionStatus = {
   subscription_status: string | null;
 };
 
+/**
+ * Resolves whether the current server-side user has member-only access.
+ *
+ * The refresh RPC runs before reading the subscription record so expired or
+ * cancelled Razorpay/demo subscriptions are evaluated with the latest status.
+ */
 export async function getMembershipAccess(
   supabase: ServerSupabaseClient,
 ) {

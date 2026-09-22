@@ -22,6 +22,12 @@ export const metadata: Metadata = {
     "Track five Stableford scores, participate in monthly prize draws, and support a charity you care about.",
 };
 
+/**
+ * Root application shell shared by every route.
+ *
+ * Loads the global font variables, site metadata and authenticated header so
+ * all public, member and admin pages keep a consistent navigation frame.
+ */
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html

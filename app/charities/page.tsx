@@ -117,6 +117,13 @@ function CharityImageFallback({
   );
 }
 
+/**
+ * Charity directory and member contribution selector.
+ *
+ * Public visitors can browse/search charities, while signed-in members can
+ * choose one charity and set the percentage of their subscription contribution
+ * that supports it.
+ */
 export default function CharitiesPage() {
   const router = useRouter();
   const [supabase] = useState(() => createClient());

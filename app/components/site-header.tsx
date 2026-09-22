@@ -15,6 +15,13 @@ function getInitials(name: string) {
     .join("");
 }
 
+/**
+ * Global header that adapts navigation to the current session.
+ *
+ * Server-side auth decides whether to show public links, member links or admin
+ * access. The same component also owns sign-out so every route exits through a
+ * consistent Supabase session clear and login redirect.
+ */
 export default async function SiteHeader() {
   const supabase = await createClient();
 

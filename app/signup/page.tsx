@@ -13,6 +13,12 @@ type CharityOption = {
   category: string;
 };
 
+/**
+ * Account creation flow for new subscribers.
+ *
+ * Signup also captures the initial charity and contribution percentage so the
+ * profile can be prepared before the member chooses a paid subscription plan.
+ */
 export default function SignupPage() {
   const router = useRouter();
 
@@ -112,6 +118,10 @@ export default function SignupPage() {
       email: email.trim(),
       password,
       options: {
+        /*
+         * The database signup trigger reads these values to seed the member's
+         * profile and charity contribution immediately after auth user creation.
+         */
         data: {
           full_name: normalizedName,
           selected_charity_id: selectedCharityId,

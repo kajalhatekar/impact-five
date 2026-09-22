@@ -32,6 +32,13 @@ function isUsableWebsiteUrl(value: string | null) {
   }
 }
 
+/**
+ * Public independent-donation route.
+ *
+ * Donations here send visitors to the charity's own website and intentionally do
+ * not affect subscriptions, draw eligibility, score records or contribution
+ * percentages inside Impact Five.
+ */
 export default async function DonatePage({
   searchParams,
 }: DonatePageProps) {

@@ -52,6 +52,12 @@ function formatStatus(status: string) {
     );
 }
 
+/**
+ * Admin subscription controls for a selected member.
+ *
+ * Supports period-end cancellation for active memberships and reactivation for
+ * demo subscriptions while preserving Razorpay-managed lifecycle boundaries.
+ */
 export default function MemberSubscriptionManager({
   userId,
   initialSubscription,

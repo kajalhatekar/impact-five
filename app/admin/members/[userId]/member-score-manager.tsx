@@ -56,6 +56,12 @@ function formatDate(value: string) {
   }).format(new Date(`${value}T00:00:00Z`));
 }
 
+/**
+ * Admin score editor for a specific member.
+ *
+ * Mirrors member score rules while allowing administrators to correct or remove
+ * records; the API route enforces admin access and latest-five retention.
+ */
 export default function MemberScoreManager({
   userId,
   initialScores,

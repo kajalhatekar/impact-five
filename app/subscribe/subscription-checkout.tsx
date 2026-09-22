@@ -80,6 +80,13 @@ function formatPrice(pricePaise: number, currency: string) {
   }).format(pricePaise / 100);
 }
 
+/**
+ * Client checkout for starting a new membership.
+ *
+ * Uses Razorpay test subscriptions as the primary payment path and keeps the
+ * clearly labelled demo subscription path separate for assessment environments
+ * where recurring sandbox payment methods are unavailable.
+ */
 export default function SubscriptionCheckout({
   plans,
   userEmail,

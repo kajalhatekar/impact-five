@@ -9,6 +9,12 @@ type PasswordInputProps = Omit<
   containerClassName?: string;
 };
 
+/**
+ * Reusable password field with a local show/hide toggle.
+ *
+ * Accepts normal input props while owning the password visibility state, keeping
+ * login and signup forms consistent without duplicating credential UI logic.
+ */
 export function PasswordInput({
   className = "",
   containerClassName = "",
