@@ -1,69 +1,149 @@
-import Image from "next/image";
+import Link from "next/link";
+
+const features = [
+  {
+    number: "01",
+    title: "Record your scores",
+    description:
+      "Add your latest five Stableford scores and keep your playing history organised.",
+  },
+  {
+    number: "02",
+    title: "Support a charity",
+    description:
+      "Select a cause and choose how much of your membership contribution supports it.",
+  },
+  {
+    number: "03",
+    title: "Enter monthly draws",
+    description:
+      "Complete your eligibility requirements and participate in the monthly prize draw.",
+  },
+];
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="bg-[#f4f1e9] text-slate-950">
+      <section className="mx-auto grid min-h-[calc(100dvh-120px)] max-w-7xl items-center gap-12 px-6 py-20 lg:grid-cols-[1.15fr_0.85fr] lg:px-10">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-[0.3em] text-emerald-700">
+            Play. Give. Change.
           </p>
+
+          <h1 className="mt-6 max-w-4xl text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+            Your golf scores can create a greater impact.
+          </h1>
+
+          <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">
+            Record your latest Stableford scores, support a charity you
+            care about, and participate in monthly prize draws through
+            one simple membership.
+          </p>
+
+          <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+            <Link
+              href="/signup"
+              className="rounded-full bg-emerald-700 px-8 py-4 text-center font-semibold text-white transition hover:bg-emerald-800"
+            >
+              Create your account
+            </Link>
+
+            <Link
+              href="/charities"
+              className="rounded-full border border-slate-300 bg-white px-8 py-4 text-center font-semibold text-slate-900 transition hover:border-emerald-700 hover:text-emerald-700"
+            >
+              Explore charities
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="overflow-hidden rounded-[2rem] bg-emerald-950 p-8 text-white shadow-xl sm:p-10">
+          <p className="text-sm font-bold uppercase tracking-[0.25em] text-emerald-300">
+            Impact Five
+          </p>
+
+          <h2 className="mt-5 text-3xl font-bold leading-tight sm:text-4xl">
+            Five scores. One cause. Monthly opportunities.
+          </h2>
+
+          <div className="mt-10 space-y-5">
+            {features.map((feature) => (
+              <div
+                key={feature.number}
+                className="rounded-2xl border border-white/15 bg-white/10 p-5"
+              >
+                <div className="flex gap-4">
+                  <span className="font-bold text-emerald-300">
+                    {feature.number}
+                  </span>
+
+                  <div>
+                    <h3 className="font-bold">{feature.title}</h3>
+                    <p className="mt-2 leading-6 text-emerald-50/80">
+                      {feature.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      <section className="bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-20 lg:px-10">
+          <div className="max-w-2xl">
+            <p className="text-sm font-bold uppercase tracking-[0.25em] text-emerald-700">
+              How it works
+            </p>
+
+            <h2 className="mt-4 text-4xl font-bold tracking-tight">
+              Make every round count
+            </h2>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {features.map((feature) => (
+              <article
+                key={feature.number}
+                className="rounded-3xl border border-slate-200 bg-[#f8f6f0] p-7"
+              >
+                <span className="text-sm font-bold text-emerald-700">
+                  {feature.number}
+                </span>
+
+                <h3 className="mt-5 text-2xl font-bold">
+                  {feature.title}
+                </h3>
+
+                <p className="mt-3 leading-7 text-slate-600">
+                  {feature.description}
+                </p>
+              </article>
+            ))}
+          </div>
+
+          <div className="mt-14 rounded-[2rem] bg-amber-300 px-7 py-10 sm:flex sm:items-center sm:justify-between sm:px-10">
+            <div>
+              <h2 className="text-3xl font-bold">
+                Ready to make an impact?
+              </h2>
+
+              <p className="mt-2 text-slate-800">
+                Create your account and select the charity you want to
+                support.
+              </p>
+            </div>
+
+            <Link
+              href="/signup"
+              className="mt-6 inline-block rounded-full bg-slate-950 px-7 py-3 font-semibold text-white transition hover:bg-slate-800 sm:mt-0"
+            >
+              Get started
+            </Link>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }
