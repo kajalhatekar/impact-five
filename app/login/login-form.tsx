@@ -42,7 +42,7 @@ export default function LoginForm() {
   }
 
   return (
-    <main className="flex min-h-[calc(100dvh-69px)] items-center justify-center bg-[#f4f1e9] px-4">
+    <main className="flex min-h-[calc(100dvh-98px)] items-center justify-center bg-[#f4f1e9] px-4">
       <section className="w-full max-w-md rounded-3xl bg-white p-8 shadow-xl">
         <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-emerald-700">
           Impact Five
