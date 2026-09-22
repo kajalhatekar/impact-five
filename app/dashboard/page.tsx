@@ -493,8 +493,13 @@ export default async function DashboardPage() {
 
       <section className="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         {/* Selected charity */}
-        <article className="overflow-hidden rounded-3xl bg-emerald-950 text-white shadow-sm">
-          <div className="p-7 sm:p-8">
+        <article className="relative overflow-hidden rounded-3xl bg-[linear-gradient(135deg,#047857,#065f46_52%,#022c22)] text-white shadow-sm">
+          <div className="absolute -left-20 top-12 h-64 w-64 rounded-full border border-white/20" />
+          <div className="absolute -bottom-20 -right-14 h-56 w-56 rounded-full bg-white/10" />
+          <div className="absolute right-16 top-16 h-4 w-4 rounded-full bg-amber-300 shadow-sm" />
+          <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.14),transparent_42%)]" />
+
+          <div className="relative z-10 p-7 sm:p-8">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-300">
               Your chosen cause
             </p>

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { PageContainer } from "@/app/components/page-container";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import MemberEditor from "./member-editor";
 
 type ProfileRecord = {
   id: string;
@@ -239,193 +240,210 @@ export default async function AdminMembersPage() {
 
   return (
     <PageContainer>
-        <Link
-          href="/admin"
-          className="font-semibold text-emerald-700 transition hover:text-emerald-900"
+      <Link
+        href="/admin"
+        className="font-semibold text-emerald-700 transition hover:text-emerald-900"
+      >
+        ← Back to admin overview
+      </Link>
+
+      <div className="mt-10 rounded-[2rem] bg-slate-950 px-7 py-10 text-white sm:px-10 lg:px-14">
+        <p className="text-sm font-bold uppercase tracking-[0.24em] text-emerald-300">
+          Administrator
+        </p>
+
+        <h1 className="mt-4 text-4xl font-bold sm:text-6xl">
+          Members and subscriptions
+        </h1>
+
+        <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-300">
+          Review registered users, membership plans, subscription status,
+          payment providers and renewal dates.
+        </p>
+      </div>
+
+      {pageError ? (
+        <div
+          role="alert"
+          className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-5 text-red-800"
         >
-          ← Back to admin overview
-        </Link>
-
-        <div className="mt-10 rounded-[2rem] bg-slate-950 px-7 py-10 text-white sm:px-10 lg:px-14">
-          <p className="text-sm font-bold uppercase tracking-[0.24em] text-emerald-300">
-            Administrator
-          </p>
-
-          <h1 className="mt-4 text-4xl font-bold sm:text-6xl">
-            Members and subscriptions
-          </h1>
-
-          <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-300">
-            Review registered users, membership plans, subscription status,
-            payment providers and renewal dates.
-          </p>
+          Unable to load members: {pageError.message}
         </div>
+      ) : (
+        <>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <article className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-emerald-950 hover:bg-emerald-950 hover:shadow-lg">
+              <p className="text-sm font-semibold text-slate-500 transition group-hover:text-emerald-200">
+                Registered users
+              </p>
 
-        {pageError ? (
-          <div
-            role="alert"
-            className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-5 text-red-800"
-          >
-            Unable to load members: {pageError.message}
+              <p className="mt-2 text-4xl font-bold text-slate-950 transition group-hover:text-white">
+                {members.length}
+              </p>
+            </article>
+
+            <article className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-emerald-950 hover:bg-emerald-950 hover:shadow-lg">
+              <p className="text-sm font-semibold text-slate-500 transition group-hover:text-emerald-200">
+                Active memberships
+              </p>
+
+              <p className="mt-2 text-4xl font-bold text-emerald-700 transition group-hover:text-white">
+                {activeMemberCount}
+              </p>
+            </article>
+
+            <article className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-emerald-950 hover:bg-emerald-950 hover:shadow-lg">
+              <p className="text-sm font-semibold text-slate-500 transition group-hover:text-emerald-200">
+                Demo subscriptions
+              </p>
+
+              <p className="mt-2 text-4xl font-bold text-slate-950 transition group-hover:text-white">
+                {demoSubscriptionCount}
+              </p>
+            </article>
+
+            <article className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-emerald-950 hover:bg-emerald-950 hover:shadow-lg">
+              <p className="text-sm font-semibold text-slate-500 transition group-hover:text-emerald-200">
+                Razorpay subscriptions
+              </p>
+
+              <p className="mt-2 text-4xl font-bold text-slate-950 transition group-hover:text-white">
+                {razorpaySubscriptionCount}
+              </p>
+            </article>
           </div>
-        ) : (
-          <>
-            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              <article className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-emerald-950 hover:bg-emerald-950 hover:shadow-lg">
-                <p className="text-sm font-semibold text-slate-500 transition group-hover:text-emerald-200">
-                  Registered users
-                </p>
 
-                <p className="mt-2 text-4xl font-bold text-slate-950 transition group-hover:text-white">
-                  {members.length}
-                </p>
-              </article>
+          <div className="mt-8 overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+            <div className="p-6 sm:p-8">
+              <h2 className="text-2xl font-bold">Registered members</h2>
 
-              <article className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-emerald-950 hover:bg-emerald-950 hover:shadow-lg">
-                <p className="text-sm font-semibold text-slate-500 transition group-hover:text-emerald-200">
-                  Active memberships
-                </p>
-
-                <p className="mt-2 text-4xl font-bold text-emerald-700 transition group-hover:text-white">
-                  {activeMemberCount}
-                </p>
-              </article>
-
-              <article className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-emerald-950 hover:bg-emerald-950 hover:shadow-lg">
-                <p className="text-sm font-semibold text-slate-500 transition group-hover:text-emerald-200">
-                  Demo subscriptions
-                </p>
-
-                <p className="mt-2 text-4xl font-bold text-slate-950 transition group-hover:text-white">
-                  {demoSubscriptionCount}
-                </p>
-              </article>
-
-              <article className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-emerald-950 hover:bg-emerald-950 hover:shadow-lg">
-                <p className="text-sm font-semibold text-slate-500 transition group-hover:text-emerald-200">
-                  Razorpay subscriptions
-                </p>
-
-                <p className="mt-2 text-4xl font-bold text-slate-950 transition group-hover:text-white">
-                  {razorpaySubscriptionCount}
-                </p>
-              </article>
+              <p className="mt-2 text-slate-600">
+                Subscription information is shown when available.
+              </p>
             </div>
 
-            <div className="mt-8 overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
-              <div className="p-6 sm:p-8">
-                <h2 className="text-2xl font-bold">Registered members</h2>
+            {members.length === 0 ? (
+              <p className="border-t border-slate-100 p-8 text-slate-600">
+                No registered users were found.
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-slate-100 text-sm text-slate-600">
+                    <tr>
+                      <th className="px-4 py-4">Member</th>
+                      <th className="px-4 py-4">Role</th>
+                      <th className="px-4 py-4">Plan</th>
+                      <th className="px-4 py-4">Status</th>
+                      <th className="px-4 py-4">Payment provider</th>
+                      <th className="px-4 py-4">Renewal/end date</th>
+                      <th className="px-4 py-4">Joined</th>
+                      <th className="px-4 py-4">Actions</th>
+                    </tr>
+                  </thead>
 
-                <p className="mt-2 text-slate-600">
-                  Subscription information is shown when available.
-                </p>
-              </div>
+                  <tbody className="divide-y divide-slate-100">
+                    {members.map((member) => (
+                      <tr key={member.id}>
+                        <td className="px-4 py-5">
+                          <p className="font-bold">{member.fullName}</p>
 
-              {members.length === 0 ? (
-                <p className="border-t border-slate-100 p-8 text-slate-600">
-                  No registered users were found.
-                </p>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[1100px] text-left">
-                    <thead className="bg-slate-100 text-sm text-slate-600">
-                      <tr>
-                        <th className="px-6 py-4">Member</th>
-                        <th className="px-6 py-4">Role</th>
-                        <th className="px-6 py-4">Plan</th>
-                        <th className="px-6 py-4">Status</th>
-                        <th className="px-6 py-4">Payment provider</th>
-                        <th className="px-6 py-4">Renewal/end date</th>
-                        <th className="px-6 py-4">Joined</th>
-                      </tr>
-                    </thead>
+                          <p className="mt-1 text-sm text-slate-500">
+                            {member.email}
+                          </p>
+                        </td>
 
-                    <tbody className="divide-y divide-slate-100">
-                      {members.map((member) => (
-                        <tr key={member.id}>
-                          <td className="px-6 py-5">
-                            <p className="font-bold">{member.fullName}</p>
+                        <td className="px-4 py-5">
+                          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold uppercase text-slate-700">
+                            {member.role}
+                          </span>
+                        </td>
 
-                            <p className="mt-1 text-sm text-slate-500">
-                              {member.email}
-                            </p>
-                          </td>
-
-                          <td className="px-6 py-5">
-                            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold uppercase text-slate-700">
-                              {member.role}
-                            </span>
-                          </td>
-
-                          <td className="px-6 py-5">
-                            {member.plan ? (
-                              <>
-                                <p className="font-semibold">
-                                  {member.plan.name}
-                                </p>
-
-                                <p className="mt-1 text-sm text-slate-500">
-                                  {formatMoney(
-                                    member.plan.price_paise,
-                                    member.plan.currency,
-                                  )}
-                                  /
-                                  {member.plan.billing_interval === "year"
-                                    ? "year"
-                                    : "month"}
-                                </p>
-                              </>
-                            ) : (
-                              <span className="text-slate-500">No plan</span>
-                            )}
-                          </td>
-
-                          <td className="px-6 py-5">
-                            <span
-                              className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${getStatusClasses(
-                                member.subscription?.status ?? null,
-                              )}`}
-                            >
-                              {formatStatus(
-                                member.subscription?.status ?? null,
-                              )}
-                            </span>
-
-                            {member.subscription?.cancel_at_period_end && (
-                              <p className="mt-2 text-xs font-semibold text-amber-700">
-                                Cancels at period end
+                        <td className="px-4 py-5">
+                          {member.plan ? (
+                            <>
+                              <p className="font-semibold">
+                                {member.plan.name}
                               </p>
-                            )}
-                          </td>
 
-                          <td className="px-6 py-5">
-                            {member.subscription?.payment_provider ? (
-                              <span className="font-semibold capitalize">
-                                {member.subscription.payment_provider}
-                              </span>
-                            ) : (
-                              <span className="text-slate-500">—</span>
-                            )}
-                          </td>
+                              <p className="mt-1 text-sm text-slate-500">
+                                {formatMoney(
+                                  member.plan.price_paise,
+                                  member.plan.currency,
+                                )}
+                                /
+                                {member.plan.billing_interval === "year"
+                                  ? "year"
+                                  : "month"}
+                              </p>
+                            </>
+                          ) : (
+                            <span className="text-slate-500">No plan</span>
+                          )}
+                        </td>
 
-                          <td className="px-6 py-5 font-semibold">
-                            {formatDate(
-                              member.subscription?.current_period_end ?? null,
-                            )}
-                          </td>
+                        <td className="px-4 py-5">
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-bold uppercase ${getStatusClasses(
+                              member.subscription?.status ?? null,
+                            )}`}
+                          >
+                            {formatStatus(member.subscription?.status ?? null)}
+                          </span>
 
-                          <td className="px-6 py-5 text-slate-600">
-                            {formatDate(member.joinedAt)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </>
-        )}
+                          {member.subscription?.cancel_at_period_end && (
+                            <p className="mt-2 text-xs font-semibold text-amber-700">
+                              Cancels at period end
+                            </p>
+                          )}
+                        </td>
+
+                        <td className="px-4 py-5">
+                          {member.subscription?.payment_provider ? (
+                            <span className="font-semibold capitalize">
+                              {member.subscription.payment_provider}
+                            </span>
+                          ) : (
+                            <span className="text-slate-500">—</span>
+                          )}
+                        </td>
+
+                        <td className="px-4 py-5 font-semibold">
+                          {formatDate(
+                            member.subscription?.current_period_end ?? null,
+                          )}
+                        </td>
+
+                        <td className="px-4 py-5 text-slate-600">
+                          {formatDate(member.joinedAt)}
+                        </td>
+
+                        <td className="px-6 py-5 align-top">
+                          <div className="flex flex-col items-start gap-3">
+                            <MemberEditor
+                              userId={member.id}
+                              initialFullName={member.fullName}
+                              initialRole={member.role}
+                              isCurrentUser={member.id === user.id}
+                            />
+
+                            <Link
+                              href={`/admin/members/${member.id}`}
+                              className="rounded-full bg-emerald-800 px-4 py-2 text-sm font-bold text-white transition hover:bg-emerald-900"
+                            >
+                              Manage scores
+                            </Link>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </PageContainer>
   );
 }

@@ -3,6 +3,7 @@
 import { useState, type SyntheticEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { PasswordInput } from "@/app/components/password-input";
 import { createClient } from "@/lib/supabase/client";
 
 export default function SignupPage() {
@@ -103,9 +104,8 @@ async function handleSignup(event: SyntheticEvent<HTMLFormElement>) {
               Password
             </label>
 
-            <input
+            <PasswordInput
               id="password"
-              type="password"
               required
               minLength={6}
               value={password}

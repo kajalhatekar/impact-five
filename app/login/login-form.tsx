@@ -3,6 +3,7 @@
 import { useState, type SyntheticEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { PasswordInput } from "@/app/components/password-input";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginForm() {
@@ -75,9 +76,8 @@ export default function LoginForm() {
               Password
             </label>
 
-            <input
+            <PasswordInput
               id="password"
-              type="password"
               required
               value={password}
               onChange={(event) => setPassword(event.target.value)}

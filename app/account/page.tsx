@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { PageContainer } from "@/app/components/page-container";
+import { PasswordInput } from "@/app/components/password-input";
 import { createClient } from "@/lib/supabase/server";
 
 import {
@@ -235,14 +236,14 @@ export default async function AccountPage({
                   New password
                 </label>
 
-                <input
+                <PasswordInput
                   id="password"
                   name="password"
-                  type="password"
                   required
                   minLength={8}
                   autoComplete="new-password"
-                  className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
+                  containerClassName="mt-2"
+                  className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
                 />
               </div>
 
@@ -254,14 +255,14 @@ export default async function AccountPage({
                   Confirm new password
                 </label>
 
-                <input
+                <PasswordInput
                   id="confirmPassword"
                   name="confirmPassword"
-                  type="password"
                   required
                   minLength={8}
                   autoComplete="new-password"
-                  className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
+                  containerClassName="mt-2"
+                  className="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
                 />
               </div>
 

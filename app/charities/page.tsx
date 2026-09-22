@@ -33,6 +33,69 @@ type Feedback = {
   text: string;
 } | null;
 
+function CharityImageFallback({
+  charity,
+  variant = "card",
+}: {
+  charity: Charity;
+  variant?: "featured" | "card";
+}) {
+  const isFeatured = variant === "featured";
+  const summary =
+    charity.impact_summary ?? charity.upcoming_event ?? charity.description;
+  const titleClasses = isFeatured
+    ? "max-w-md text-5xl font-black leading-none text-white sm:text-6xl"
+    : "max-w-md text-3xl font-black leading-none text-emerald-950";
+
+  return (
+    <div
+      className={`relative flex h-full min-h-full overflow-hidden ${
+        isFeatured
+          ? "bg-[linear-gradient(135deg,#059669,#047857_52%,#064e3b)] p-8 sm:p-10"
+          : "bg-[linear-gradient(135deg,#ecfdf5,#bbf7d0_52%,#86efac)] p-5"
+      }`}
+    >
+      <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.42),transparent_42%)]" />
+      <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white/30 to-transparent" />
+      {isFeatured && (
+        <>
+          <div className="absolute -left-20 top-12 h-64 w-64 rounded-full border border-white/20" />
+          <div className="absolute -bottom-20 -right-14 h-56 w-56 rounded-full bg-white/10" />
+          <div className="absolute right-16 top-16 h-4 w-4 rounded-full bg-amber-300 shadow-sm" />
+        </>
+      )}
+
+      <div
+        className={`relative z-10 flex w-full flex-col justify-between ${
+          isFeatured ? "min-h-96" : "min-h-28"
+        }`}
+      >
+        <div>
+          <span
+            className={`inline-flex rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] ${
+              isFeatured
+                ? "bg-white/20 text-white"
+                : "bg-white/65 text-emerald-800"
+            }`}
+          >
+            {charity.category}
+          </span>
+        </div>
+
+        <div>
+          <p className={titleClasses}>{charity.name}</p>
+
+          {isFeatured && (
+            <p className="mt-5 max-w-sm text-base leading-7 text-emerald-50">
+              {summary}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function CharitiesPage() {
   const router = useRouter();
   const [supabase] = useState(() => createClient());
@@ -232,7 +295,7 @@ export default function CharitiesPage() {
             Give back
           </p>
 
-          <div className="mt-4 grid gap-7 lg:grid-cols-[1fr_420px] lg:items-end">
+          <div className="mt-4 grid gap-7 lg:grid-cols-[1fr_420px] lg:items-center">
             <div>
               <h1 className="max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
                 Your subscription can create meaningful change.
@@ -278,11 +341,10 @@ export default function CharitiesPage() {
                 }`}
               >
                 {!featuredCharity.image_url && (
-                  <div className="flex min-h-72 items-center justify-center">
-                    <span className="text-8xl font-black text-white/20">
-                      {featuredCharity.name.charAt(0)}
-                    </span>
-                  </div>
+                  <CharityImageFallback
+                    charity={featuredCharity}
+                    variant="featured"
+                  />
                 )}
               </div>
 
@@ -320,7 +382,7 @@ export default function CharitiesPage() {
         </section>
       )}
 
-      <section className="-mx-5 mt-16 border-y border-slate-200 bg-white px-5 py-14 sm:-mx-8 sm:px-8 sm:py-16">
+      <section className="-mx-5 mt-16 rounded-3xl border border-slate-200 bg-white px-5 py-14 sm:-mx-8 sm:px-8 sm:py-16">
         <div>
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,480px)] lg:items-end">
             <div>
@@ -422,11 +484,7 @@ export default function CharitiesPage() {
                       }`}
                     >
                       {!charity.image_url && (
-                        <div className="flex h-full items-center justify-center">
-                          <span className="text-5xl font-black text-emerald-800/20">
-                            {charity.name.charAt(0)}
-                          </span>
-                        </div>
+                        <CharityImageFallback charity={charity} />
                       )}
                     </div>
 
