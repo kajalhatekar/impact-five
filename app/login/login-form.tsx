@@ -75,12 +75,21 @@ export default function LoginForm() {
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
-              Password
-            </label>
+            <div className="mb-2 flex items-center justify-between gap-4">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-slate-700"
+              >
+                Password
+              </label>
+
+              <Link
+                href="/forgot-password"
+                className="text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+              >
+                Forgot password?
+              </Link>
+            </div>
 
             <PasswordInput
               id="password"
@@ -90,13 +99,13 @@ export default function LoginForm() {
               className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-950 outline-none focus:border-emerald-600"
               placeholder="Enter your password"
             />
-          </div>
 
-          {message && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
-              {message}
-            </p>
-          )}
+            {message && (
+              <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+                {message}
+              </p>
+            )}
+          </div>
 
           <button
             type="submit"
